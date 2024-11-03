@@ -58,6 +58,15 @@ my_dest = input()
 crs_list = [my_start,]
 
 for station in crs_list:
+    # GetDepBoardWithDetails is limited to listing 10 departures.
+    # But we have to use it, because it's the endpoint that includes stops
+    # for each train. In contrast, GetDeparturesBoard retrieves unlimited
+    # departures, but no stops, only the 'destination'.
+    # This refers to the final stop on the train's route.
+    # A hacky workaround (to be implemented) is to use time offsets to get
+    # more results; you can offset by up to 2 hours. That's still not very
+    # much, though for smaller stations it may be sufficient.
+    # Hopefully there's some way around this limitation...
     res = client.service.GetDepBoardWithDetails(numRows=10, crs=station, _soapheaders=[header_value])
 
     print("Trains at " + res.locationName)
@@ -67,7 +76,6 @@ for station in crs_list:
     print("For station: " + station + " to: " + my_dest)
     for train in trainServices["service"]:
         lists_of_stops = train.subsequentCallingPoints['callingPointList']
-        counter = 0
         for list_of_stops in lists_of_stops:
             # this is the actual list of stops, per train
             for stop in list_of_stops['callingPoint']:
