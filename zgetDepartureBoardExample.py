@@ -19,14 +19,14 @@
 # THE ORIGINAL EXAMPLE IS TAKEN FROM HERE:
 # https://github.com/openraildata/openldbws-example-python
 # GPL! GPL!
+# The SOAP stuff is all copied from there.
+
+# This script lets you see what trains are leaving from some station,
+# to some other station. You'd think it'd be very simple, but.
 
 from zeep import Client, Settings, xsd
 from zeep.plugins import HistoryPlugin
 
-# I want to get trains that call at some two stations
-# so I need any trains that leave station X and have callingPoints.crs Y
-# First: hardcode stations
-# Then: make it configurable
 
 with open(".apikey") as file:
     LDB_TOKEN = file.read().rstrip()
@@ -58,27 +58,21 @@ my_dest = input()
 crs_list = [my_start,]
 
 for station in crs_list:
-#    res = client.service.GetDepBoardWithDetails(numRows=30, crs=station, _soapheaders=[header_value])
     res = client.service.GetDepBoardWithDetails(numRows=10, crs=station, _soapheaders=[header_value])
 
     print("Trains at " + res.locationName)
     print("===============================")
 
     trainServices= res.trainServices
-#    print(trains)
     print("For station: " + station + " to: " + my_dest)
     for train in trainServices["service"]:
-#        print(train)
         lists_of_stops = train.subsequentCallingPoints['callingPointList']
         counter = 0
         for list_of_stops in lists_of_stops:
-#            print(list_of_stops)
             # this is the actual list of stops, per train
-#            print(list_of_stops['callingPoint'])
             for stop in list_of_stops['callingPoint']:
                 stop_code = (stop['crs'])
                 if stop_code == my_dest:
-#                    print(train)
                     if train['isCancelled']:
                         print("[[Cancelled train hidden from list.]]\n")
                     else:
