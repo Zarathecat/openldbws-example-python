@@ -51,13 +51,19 @@ header = xsd.Element(
 )
 header_value = header(TokenValue=LDB_TOKEN)
 
-print("What station are you going from? (Input 3 letter code)")
-my_start = input()
-print("What station are you going to? (Input 3 letter code)")
-my_dest = input()
-crs_list = [my_start,]
+# TODO: commandline --h flag that lists 3-letter codes mapped to
+# station names.
 
-for station in crs_list:
+print("What station are you going from? (Input 3 letter code)")
+start = input()
+
+# TODO: Let user list multiple destinations at once
+print("What station are you going to? (Input 3 letter code)")
+dest = input()
+
+
+def list_trains(my_start, my_dest):
+    station = my_start
     # GetDepBoardWithDetails is limited to listing 10 departures.
     # But we have to use it, because it's the endpoint that includes stops
     # for each train. In contrast, GetDeparturesBoard retrieves unlimited
@@ -90,3 +96,7 @@ for station in crs_list:
                         print("Train arrives at " + my_dest + " at " + stop['st'])
                         print("\n")
 
+list_trains(start, dest)
+print("Reverse journey? (y/n)")
+if input() == "y":
+    list_trains(dest, start)
